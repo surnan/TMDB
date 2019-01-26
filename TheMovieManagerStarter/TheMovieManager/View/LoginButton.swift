@@ -9,8 +9,6 @@
 import UIKit
 
 
-//TEST
-
 class LoginButton: UIButton {
     
     override func awakeFromNib() {
