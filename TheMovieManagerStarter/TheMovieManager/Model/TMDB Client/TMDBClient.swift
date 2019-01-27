@@ -68,7 +68,12 @@ class TMDBClient {
         
         let _Logout = Logout(sessionId: Auth.sessionId)
         request.httpBody = try! JSONEncoder().encode(_Logout)
-        URLSession.shared.dataTask(with: request).resume()
+  
+        URLSession.shared.dataTask(with: request) { (_, _, _) in
+            Auth.requestToken = ""
+            Auth.sessionId = ""
+        }
+    
         completion()
         return
     }
