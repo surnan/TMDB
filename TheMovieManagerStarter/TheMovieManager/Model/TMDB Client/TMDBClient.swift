@@ -61,34 +61,57 @@ class TMDBClient {
     }
     
 
+    class func taskForGetRequest<ResponseType:Codable>(url: URL, type: ResponseType.Type, completion: @escaping (ResponseType?, Error?)-> Void){
+        URLSession.shared.dataTask(with: url) { (data, resp, err) in
+            guard let data = data else {
+                completion(nil, err)
+                return
+            }
+            do {
+//                let temp = try JSONDecoder().decode(type.self, from: data)            //Also works
+//                let temp = try JSONDecoder().decode(type.self.self.self, from: data)  //Also works
+                let responseObject = try JSONDecoder().decode(ResponseType.self, from: data)
+                completion(responseObject, nil)
+            } catch {
+                print("Data was recived but unable to convert it to desired type\n \(error.localizedDescription)")
+                completion(nil, error)
+            }
+            return
+        }.resume()
+    }
+    
+    class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
+        let url = Endpoints.getWatchlist.url
+        taskForGetRequest(url: url, type: MovieResults.self) { (resp, err) in
+            if let response = resp {
+                completion(response.results, nil)
+            } else {
+                completion([], err)
+            }
+            return
+        }
+    }
+    
     class func handleLogout(completion: @escaping ()-> Void){
         var request = URLRequest(url: Endpoints.logout.url)
         request.httpMethod = "DELETE"
         request.addValue("application/json", forHTTPHeaderField: "content-mode")
-        
         let _Logout = Logout(sessionId: Auth.sessionId)
         request.httpBody = try! JSONEncoder().encode(_Logout)
-  
         URLSession.shared.dataTask(with: request) { (_, _, _) in
             Auth.requestToken = ""
             Auth.sessionId = ""
         }
-    
         completion()
         return
     }
-    
     
     class func createSessionId(completion: @escaping (Bool, Error?)-> Void){
         var request = URLRequest(url: Endpoints.createSessionId.url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "content-type")
-        
         let _PostSession = PostSession(requestToken: Auth.requestToken)
-
-        
         request.httpBody = try! JSONEncoder().encode(_PostSession)
-        
         URLSession.shared.dataTask(with: request) { (data, resp, err) in
             guard let data = data else {
                 completion(false, err)
@@ -154,23 +177,5 @@ class TMDBClient {
         }.resume()
     }
     
-    
-    
-    class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: Endpoints.getWatchlist.url) { data, response, error in
-            guard let data = data else {
-                completion([], error)
-                return
-            }
-            let decoder = JSONDecoder()
-            do {
-                let responseObject = try decoder.decode(MovieResults.self, from: data)
-                completion(responseObject.results, nil)
-            } catch {
-                completion([], error)
-            }
-        }
-        task.resume()
-    }
     
 }
