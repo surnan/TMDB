@@ -72,11 +72,13 @@ class TMDBClient {
 //                let temp = try JSONDecoder().decode(type.self.self.self, from: data)  //Also works
                 let responseObject = try JSONDecoder().decode(ResponseType.self, from: data)
                 completion(responseObject, nil)
+                return
             } catch {
                 print("Data was recived but unable to convert it to desired type\n \(error.localizedDescription)")
                 completion(nil, error)
+                return
             }
-            return
+            //  return <-- Failes because the code blocks for do/catch execute AFTER this line.  So we need "return" in EACH block
         }.resume()
     }
     
@@ -92,6 +94,23 @@ class TMDBClient {
         }
     }
     
+    
+    class func getRequestToken(completion: @escaping (Bool, Error?)-> Void){
+        let url = Endpoints.getRequestToken.url
+        taskForGetRequest(url: url, type: RequestTokenResponse.self) { (resp, err) in
+            if let responseObject = resp {
+                Auth.requestToken = responseObject.requestToken
+                completion(responseObject.success, nil)
+            } else {
+                completion(false, err)
+            }
+            return  //<-- Unlike --> func taskForGetRequest
+                    //This gets executed AFTER if-else so we only need to add return once to this function
+        }
+    }
+    
+    
+ 
     class func handleLogout(completion: @escaping ()-> Void){
         var request = URLRequest(url: Endpoints.logout.url)
         request.httpMethod = "DELETE"
@@ -156,7 +175,7 @@ class TMDBClient {
     }
     
     
-    class func getRequestToken(completion: @escaping (Bool, Error?)-> Void){
+    class func getRequestToken2(completion: @escaping (Bool, Error?)-> Void){
         let url = Endpoints.getRequestToken.url
         URLSession.shared.dataTask(with: url) { (data, resp, err) in
             guard let data = data else {
