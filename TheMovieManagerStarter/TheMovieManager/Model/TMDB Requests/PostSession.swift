@@ -9,3 +9,12 @@
 import Foundation
 
 
+struct PostSession: Codable {
+    var requestToken: String
+    
+    enum CodingKeys: String, CodingKey {
+        case requestToken = "request_token"
+    }
+}
+
+

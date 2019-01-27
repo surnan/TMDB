@@ -9,3 +9,12 @@
 import Foundation
 
 
+struct SessionResponse: Codable {
+    var success: Bool
+    var session: String
+    
+    enum CodingKeys: String, CodingKey {
+        case success
+        case session = "session_id"
+    }
+}

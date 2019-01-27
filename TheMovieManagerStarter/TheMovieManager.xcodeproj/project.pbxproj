@@ -35,6 +35,7 @@
 		2316888D2122322D003C820E /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2316888C2122322D003C820E /* Colors.swift */; };
 		2316888F2122646A003C820E /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2316888E2122646A003C820E /* GradientView.swift */; };
 		2316889121226AE7003C820E /* LoginTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2316889021226AE7003C820E /* LoginTextField.swift */; };
+		840FB9EC21FD37760028C7FF /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840FB9EB21FD37760028C7FF /* LoginResponse.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +69,7 @@
 		2316888C2122322D003C820E /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		2316888E2122646A003C820E /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		2316889021226AE7003C820E /* LoginTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTextField.swift; sourceTree = "<group>"; };
+		840FB9EB21FD37760028C7FF /* LoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +187,7 @@
 				231688782121CB74003C820E /* RequestTokenResponse.swift */,
 				2316887A2121CB87003C820E /* TMDBResponse.swift */,
 				2316887C2121CB9A003C820E /* SessionResponse.swift */,
+				840FB9EB21FD37760028C7FF /* LoginResponse.swift */,
 			);
 			path = "TMDB Responses";
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 				231688872121CBF9003C820E /* PostSession.swift in Sources */,
 				2316888D2122322D003C820E /* Colors.swift in Sources */,
 				2316888F2122646A003C820E /* GradientView.swift in Sources */,
+				840FB9EC21FD37760028C7FF /* LoginResponse.swift in Sources */,
 				2316887F2121CBC7003C820E /* MarkFavorite.swift in Sources */,
 				2316887B2121CB87003C820E /* TMDBResponse.swift in Sources */,
 				231688652121CA51003C820E /* FavoritesViewController.swift in Sources */,

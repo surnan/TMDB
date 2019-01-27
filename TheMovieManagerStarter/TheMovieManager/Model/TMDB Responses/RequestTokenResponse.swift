@@ -9,3 +9,18 @@
 import Foundation
 
 
+struct RequestTokenResponse: Codable {
+    var success: Bool
+    var expires: String
+    var requestToken: String
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case success
+        case expires = "expires_at"
+        case requestToken = "request_token"
+    }
+}
+
+
+

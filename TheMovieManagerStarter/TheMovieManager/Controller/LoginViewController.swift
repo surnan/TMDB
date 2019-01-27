@@ -20,14 +20,55 @@ class LoginViewController: UIViewController {
         
         emailTextField.text = ""
         passwordTextField.text = ""
+        
     }
     
     @IBAction func loginTapped(_ sender: UIButton) {
-        performSegue(withIdentifier: "completeLogin", sender: nil)
+        TMDBClient.getRequestToken(completion: handleGetRequestToken(success:error:))
     }
     
     @IBAction func loginViaWebsiteTapped() {
-        performSegue(withIdentifier: "completeLogin", sender: nil)
+        TMDBClient.getRequestToken { (success, err) in
+            if success {
+                let url = TMDBClient.Endpoints.webAuth.url
+                //opening browser for user is interacting with AI
+                DispatchQueue.main.async {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            } else {
+                print("Error in loginViaWebsiteTapped \(String(describing: err?.localizedDescription))")
+            }
+        }
+        
     }
     
+    
+    func handleSessionResponse(success: Bool, error: Error?){
+        if success {
+            DispatchQueue.main.async {
+                self.performSegue(withIdentifier: "completeLogin", sender: nil)
+            }
+        } else {
+            print("failure in handleSessionResponse \(error ?? "" as! Error)")
+        }
+    }
+    
+    
+    func handleGetRequestToken(success: Bool, error: Error?){
+        if success {
+            DispatchQueue.main.async {
+                TMDBClient.getLogin(name: self.emailTextField.text ?? "", password: self.passwordTextField.text ?? "", completion: self.handleLoginResponse(success:error:))
+            }
+        } else {
+            print("failure in handleGetRequestToken \(error ?? "" as! Error)")
+        }
+    }
+    
+    func handleLoginResponse(success: Bool, error: Error?){
+        if success {
+            TMDBClient.createSessionId(completion: handleSessionResponse(success:error:))
+        } else {
+            print("failure in handleLogin \(error ?? "" as! Error)")
+        }
+    }
 }
