@@ -64,18 +64,24 @@ class TMDBClient {
     class func taskForGetRequest<ResponseType:Decodable>(url: URL, type: ResponseType.Type, completion: @escaping (ResponseType?, Error?)-> Void){
         URLSession.shared.dataTask(with: url) { (data, resp, err) in
             guard let data = data else {
-                completion(nil, err)
+                DispatchQueue.main.async {
+                    completion(nil, err)
+                }
                 return
             }
             do {
 //                let temp = try JSONDecoder().decode(type.self, from: data)            //Also works
 //                let temp = try JSONDecoder().decode(type.self.self.self, from: data)  //Also works
                 let responseObject = try JSONDecoder().decode(ResponseType.self, from: data)
-                completion(responseObject, nil)
+                DispatchQueue.main.async {
+                    completion(responseObject, nil)
+                }
                 return
             } catch {
                 print("Data was recived but unable to convert it to desired type\n \(error.localizedDescription)")
-                completion(nil, error)
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
                 return
             }
             //  return <-- Failes because the code blocks for do/catch execute AFTER this line.  So we need "return" in EACH block
@@ -135,16 +141,22 @@ class TMDBClient {
         
         URLSession.shared.dataTask(with: request) { (data, resp, err) in
             guard let data = data else {
-                completion(nil, err)
+                DispatchQueue.main.async {
+                    completion(nil, err)
+                }
                 return
             }
             do{
                 let temp = try JSONDecoder().decode(ResponseType.self, from: data)
-                completion(temp, nil)
+                DispatchQueue.main.async {
+                    completion(temp, nil)
+                }
                 return
             } catch {
                 print("Error decoding JSON file but we did verify that data has been pulled /n  \(error)")
-                completion(nil, error)
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
                 return
             }
         }.resume()

@@ -17,10 +17,8 @@ class LoginViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         emailTextField.text = ""
         passwordTextField.text = ""
-        
     }
     
     @IBAction func loginTapped(_ sender: UIButton) {
@@ -32,22 +30,17 @@ class LoginViewController: UIViewController {
             if success {
                 let url = TMDBClient.Endpoints.webAuth.url
                 //opening browser for user is interacting with AI
-                DispatchQueue.main.async {
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
             } else {
                 print("Error in loginViaWebsiteTapped \(String(describing: err?.localizedDescription))")
             }
         }
-        
     }
     
     
     func handleSessionResponse(success: Bool, error: Error?){
         if success {
-            DispatchQueue.main.async {
                 self.performSegue(withIdentifier: "completeLogin", sender: nil)
-            }
         } else {
             print("failure in handleSessionResponse \(error ?? "" as! Error)")
         }
@@ -56,9 +49,7 @@ class LoginViewController: UIViewController {
     
     func handleGetRequestToken(success: Bool, error: Error?){
         if success {
-            DispatchQueue.main.async {
                 TMDBClient.getLogin(name: self.emailTextField.text ?? "", password: self.passwordTextField.text ?? "", completion: self.handleLoginResponse(success:error:))
-            }
         } else {
             print("failure in handleGetRequestToken \(error ?? "" as! Error)")
         }
