@@ -125,27 +125,43 @@ class TMDBClient {
         return
     }
     
-    class func createSessionId(completion: @escaping (Bool, Error?)-> Void){
-        var request = URLRequest(url: Endpoints.createSessionId.url)
+    
+    
+    class func taskForPostResponse  <EncodedStruct: Codable, DecodedStruct: Codable>(encoding: EncodedStruct, decoding: DecodedStruct.Type, url: URL, completion: @escaping(DecodedStruct?, Error?)-> Void){
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "content-type")
-        let _PostSession = PostSession(requestToken: Auth.requestToken)
-        request.httpBody = try! JSONEncoder().encode(_PostSession)
+        request.httpBody = try! JSONEncoder().encode(encoding)
+        
         URLSession.shared.dataTask(with: request) { (data, resp, err) in
             guard let data = data else {
+                completion(nil, err)
+                return
+            }
+            do{
+                let temp = try JSONDecoder().decode(DecodedStruct.self, from: data)
+                completion(temp, nil)
+                return
+            } catch {
+                print("Error decoding JSON file but we did verify that data has been pulled /n  \(error)")
+                completion(nil, error)
+                return
+            }
+        }.resume()
+    }
+    
+    class func createSessionId(completion: @escaping (Bool, Error?)-> Void){
+        let url = Endpoints.createSessionId.url
+        let encoding2 = PostSession(requestToken: Auth.requestToken)
+        taskForPostResponse(encoding: encoding2, decoding: SessionResponse.self, url: url) { (response, err) in
+            guard let responseObject = response else {
                 completion(false, err)
                 return
             }
-            do {
-                let __PostSession2 = try JSONDecoder().decode(SessionResponse.self, from: data)
-                Auth.sessionId = __PostSession2.session
-                completion(true, nil)
-                return
-            } catch {
-                print("1 - Unable to convert data to valid LoginRequest struct \n Or invalid Login credentials \(error.localizedDescription)")
-                completion(false, error)
-            }
-            }.resume()
+            Auth.sessionId = responseObject.session
+            completion(true, nil)
+            return
+        }
     }
     
     
