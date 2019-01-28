@@ -127,11 +127,11 @@ class TMDBClient {
     
     
     
-    class func taskForPostResponse  <EncodedStruct: Encodable, DecodedStruct: Decodable>(encoding: EncodedStruct, decoding: DecodedStruct.Type, url: URL, completion: @escaping(DecodedStruct?, Error?)-> Void){
+    class func taskForPostRequest  <RequestType: Encodable, ResponseType: Decodable>(body: RequestType, responseType: ResponseType.Type, url: URL, completion: @escaping(ResponseType?, Error?)-> Void){
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "content-type")
-        request.httpBody = try! JSONEncoder().encode(encoding)
+        request.httpBody = try! JSONEncoder().encode(body)
         
         URLSession.shared.dataTask(with: request) { (data, resp, err) in
             guard let data = data else {
@@ -139,7 +139,7 @@ class TMDBClient {
                 return
             }
             do{
-                let temp = try JSONDecoder().decode(DecodedStruct.self, from: data)
+                let temp = try JSONDecoder().decode(ResponseType.self, from: data)
                 completion(temp, nil)
                 return
             } catch {
@@ -153,7 +153,7 @@ class TMDBClient {
     class func createSessionId(completion: @escaping (Bool, Error?)-> Void){
         let url = Endpoints.createSessionId.url
         let encoding2 = PostSession(requestToken: Auth.requestToken)
-        taskForPostResponse(encoding: encoding2, decoding: SessionResponse.self, url: url) { (response, err) in
+        taskForPostRequest(body: encoding2, responseType: SessionResponse.self, url: url) { (response, err) in
             guard let responseObject = response else {
                 completion(false, err)
                 return
@@ -169,7 +169,7 @@ class TMDBClient {
         let url = Endpoints.login.url
         let encodable = LoginRequest(username: name, password: password, requestToken: Auth.requestToken)
         let decodable = LoginResponse.self
-        taskForPostResponse(encoding: encodable, decoding: decodable, url: url) { (response, err) in
+        taskForPostRequest(body: encodable, responseType: decodable, url: url) { (response, err) in
             guard let responseObject = response else {
                 completion(false, err)
                 return
