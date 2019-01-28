@@ -61,7 +61,7 @@ class TMDBClient {
     }
     
 
-    class func taskForGetRequest<ResponseType:Codable>(url: URL, type: ResponseType.Type, completion: @escaping (ResponseType?, Error?)-> Void){
+    class func taskForGetRequest<ResponseType:Decodable>(url: URL, type: ResponseType.Type, completion: @escaping (ResponseType?, Error?)-> Void){
         URLSession.shared.dataTask(with: url) { (data, resp, err) in
             guard let data = data else {
                 completion(nil, err)
@@ -127,7 +127,7 @@ class TMDBClient {
     
     
     
-    class func taskForPostResponse  <EncodedStruct: Codable, DecodedStruct: Codable>(encoding: EncodedStruct, decoding: DecodedStruct.Type, url: URL, completion: @escaping(DecodedStruct?, Error?)-> Void){
+    class func taskForPostResponse  <EncodedStruct: Encodable, DecodedStruct: Decodable>(encoding: EncodedStruct, decoding: DecodedStruct.Type, url: URL, completion: @escaping(DecodedStruct?, Error?)-> Void){
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "content-type")
@@ -166,51 +166,17 @@ class TMDBClient {
     
     
     class func getLogin(name: String, password: String, completion: @escaping(Bool, Error?)-> Void){
-        var request = URLRequest(url: Endpoints.login.url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "content-type")
-        
-        let _LoginRequest = LoginRequest(username: name, password: password, requestToken: Auth.requestToken)
-        request.httpBody = try! JSONEncoder().encode(_LoginRequest.self)
-        
-        URLSession.shared.dataTask(with: request) { (data, resp, err) in
-            guard let data = data else {
+        let url = Endpoints.login.url
+        let encodable = LoginRequest(username: name, password: password, requestToken: Auth.requestToken)
+        let decodable = LoginResponse.self
+        taskForPostResponse(encoding: encodable, decoding: decodable, url: url) { (response, err) in
+            guard let responseObject = response else {
                 completion(false, err)
                 return
             }
-            do {
-                let _LoginRequest2 = try JSONDecoder().decode(LoginResponse.self, from: data)
-                Auth.requestToken = _LoginRequest2.requestToken
-                completion(true, nil)
-                return
-            } catch {
-                print("2 - Unable to convert data to valid LoginRequest struct \n Or invalid Login credentials \(error.localizedDescription)")
-                completion(false, error)
-            }
-            }.resume()
+            Auth.requestToken = responseObject.requestToken
+            completion(true, nil)
+            return
+        }
     }
-    
-    
-    class func getRequestToken2(completion: @escaping (Bool, Error?)-> Void){
-        let url = Endpoints.getRequestToken.url
-        URLSession.shared.dataTask(with: url) { (data, resp, err) in
-            guard let data = data else {
-                completion(false, err)
-                return
-            }
-            do {
-            let _RequestTokenResponse = try JSONDecoder().decode(RequestTokenResponse.self, from: data)
-                Auth.requestToken = _RequestTokenResponse.requestToken
-                print("Auth.requestToken = \(Auth.requestToken)")
-                completion(true, nil)
-                return
-            } catch {
-                print("Unable to obtain request token with API Key --> \(error.localizedDescription)")
-                completion(false, error)
-                return
-            }
-        }.resume()
-    }
-    
-    
 }
