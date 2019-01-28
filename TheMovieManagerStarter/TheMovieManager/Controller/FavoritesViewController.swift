@@ -16,13 +16,22 @@ class FavoritesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         tableView.reloadData()
+        TMDBClient.getFavoritesList { (movies, error) in
+            MovieModel.favorites = movies
+            self.tableView.reloadData()
+        }
+    }
+    
+    
+    //func getFavoritesList(completion: @escaping ([Movie], Error?)-> Void)
+    
+    func handleGetFavoritesList(movies: [Movie], err: Error?){
+        movies.forEach{print($0.title)}
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -31,7 +40,6 @@ class FavoritesViewController: UIViewController {
             detailVC.movie = MovieModel.favorites[selectedIndex]
         }
     }
-    
 }
 
 extension FavoritesViewController: UITableViewDataSource, UITableViewDelegate {

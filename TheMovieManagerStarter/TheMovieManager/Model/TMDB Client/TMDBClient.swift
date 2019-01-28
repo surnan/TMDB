@@ -13,7 +13,7 @@ class TMDBClient {
     static let apiKey = "d6dff50ddfca06c2f90832ec086183fc"
     
     struct Auth {
-        static var accountId = 0
+        static var accountId = 0    //<--- Enter any Int on Queries. Not fully implemented by TMDB yet
         static var requestToken = ""
         static var sessionId = ""
     }
@@ -28,6 +28,7 @@ class TMDBClient {
         case createSessionId
         case webAuth
         case logout
+        case getFavorites
         
         var stringValue: String {
             switch self {
@@ -52,6 +53,11 @@ class TMDBClient {
             case .logout: return Endpoints.base
                 + "/authentication/session"
                 + Endpoints.apiKeyParam
+            case .getFavorites: return Endpoints.base
+                + "/account/\(Auth.accountId)/favorite/movies"
+                + Endpoints.apiKeyParam
+                + "&session_id=\(Auth.sessionId)"
+//                + "&language=en-US&sort_by=created_at.asc&page=1"
             }
         }
         
@@ -88,17 +94,17 @@ class TMDBClient {
         }.resume()
     }
     
-    class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
-        let url = Endpoints.getWatchlist.url
-        taskForGetRequest(url: url, type: MovieResults.self) { (resp, err) in
-            if let response = resp {
-                completion(response.results, nil)
+    class func getFavoritesList(completion: @escaping ([Movie], Error?)-> Void){
+        let url = Endpoints.getFavorites.url
+        taskForGetRequest(url: url, type: MovieResults.self) { (data, err) in
+            if let responseObject  = data {
+                completion(responseObject.results, nil)
             } else {
-                completion([], err)
+                completion([], nil)
             }
-            return
         }
     }
+    
     
     
     class func getRequestToken(completion: @escaping (Bool, Error?)-> Void){
@@ -111,9 +117,23 @@ class TMDBClient {
                 completion(false, err)
             }
             return  //<-- Unlike --> func taskForGetRequest
-                    //This gets executed AFTER if-else so we only need to add return once to this function
+            //This gets executed AFTER if-else so we only need to add return once to this function
         }
     }
+    
+    class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
+        let url = Endpoints.getWatchlist.url
+        taskForGetRequest(url: url, type: MovieResults.self) { (resp, err) in
+            if let response = resp {
+                completion(response.results, nil)
+            } else {
+                completion([], err)
+            }
+            return
+        }
+    }
+    
+ 
     
     
  
