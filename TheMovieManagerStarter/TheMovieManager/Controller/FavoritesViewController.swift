@@ -28,6 +28,7 @@ class FavoritesViewController: UIViewController {
     }
     
     
+
     //func getFavoritesList(completion: @escaping ([Movie], Error?)-> Void)
     
     func handleGetFavoritesList(movies: [Movie], err: Error?){

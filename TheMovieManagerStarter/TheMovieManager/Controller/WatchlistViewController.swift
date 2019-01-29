@@ -25,7 +25,6 @@ class WatchlistViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         tableView.reloadData()
     }
     
@@ -39,7 +38,6 @@ class WatchlistViewController: UIViewController {
 }
 
 extension WatchlistViewController: UITableViewDataSource, UITableViewDelegate {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -50,11 +48,8 @@ extension WatchlistViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieTableViewCell")!
-        
         let movie = MovieModel.watchlist[indexPath.row]
-        
         cell.textLabel?.text = movie.title
-        
         return cell
     }
     
@@ -63,5 +58,4 @@ extension WatchlistViewController: UITableViewDataSource, UITableViewDelegate {
         performSegue(withIdentifier: "showDetail", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    
 }
