@@ -14,8 +14,8 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     var movies = [Movie]()
-    
     var selectedIndex = 0
+    var currentSearchTask: URLSessionTask?
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
@@ -23,18 +23,14 @@ class SearchViewController: UIViewController {
             detailVC.movie = movies[selectedIndex]
         }
     }
-    
 }
 
 extension SearchViewController: UISearchBarDelegate {
-    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        TMDBClient.search(query: searchText) { (data, err) in
-           
+        currentSearchTask?.cancel()
+        currentSearchTask = TMDBClient.search(query: searchText) { (data, err) in
             self.movies = data
             self.tableView.reloadData()
-            
-            
         }
     }
     
@@ -53,7 +49,6 @@ extension SearchViewController: UISearchBarDelegate {
 }
 
 extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -64,11 +59,8 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieTableViewCell")!
-        
         let movie = movies[indexPath.row]
-        
         cell.textLabel?.text = "\(movie.title) - \(movie.releaseYear)"
-        
         return cell
     }
     

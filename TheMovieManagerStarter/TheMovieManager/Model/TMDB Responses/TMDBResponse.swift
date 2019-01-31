@@ -17,3 +17,16 @@ struct TMDBResponse: Codable {
         case statusMessage = "status_message"
     }
 }
+
+//now that it conforms to LocalizedError, it conforms to TYPE=ERROR
+//We can pass it in as the error to our completion handler
+extension TMDBResponse: LocalizedError {
+    var errorDescription: String? {
+        return statusMessage //We'll get message of invalid login, bad api key,etc..
+                            //Whatever error messages TMDB spits back at us
+    }
+}
+
+
+// Error cast as TMDB Struct
+// Error.localized
